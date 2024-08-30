@@ -13,6 +13,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a command for declining a game invite.
+ */
 public class decline implements CommandInterface {
 
     /**

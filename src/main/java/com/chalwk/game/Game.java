@@ -21,27 +21,17 @@ import static com.chalwk.game.Guess.showGuesses;
  */
 public class Game {
 
-    /**
-     * The user who initiated the game.
-     */
     private final User invitingPlayer;
-    /**
-     * The user who was invited to join the game.
-     */
     private final User invitedPlayer;
     private final SlashCommandInteractionEvent event;
     private final int hangmanLayout;
     private final String wordToGuess;
+    private final int maxMistakes;
+    private final GameManager gameManager;
     public int mistakes = 0;
     public List<Character> guesses = new ArrayList<>();
     private String embedID;
     private User whos_turn;
-    private final int maxMistakes;
-    private final GameManager gameManager;
-
-    /**
-     * The start time of the game.
-     */
     private Date startTime;
 
     /**
@@ -64,6 +54,13 @@ public class Game {
         startGame(event);
     }
 
+    /**
+     * Creates an embed for the game with the specified game and guess box.
+     *
+     * @param game     the game to create an embed for
+     * @param guessBox the guess box to display in the embed
+     * @return the embed for the game
+     */
     public static EmbedBuilder createGameEmbed(Game game, String guessBox) {
         String stage = game.getCurrentLayout().getLayout();
         return new EmbedBuilder()
@@ -77,18 +74,36 @@ public class Game {
                 .setColor(Color.BLUE);
     }
 
+    /**
+     * Gets the ID of the message embed for the game.
+     *
+     * @return the ID of the message embed for the game
+     */
     public String getEmbedID() {
         return this.embedID;
     }
 
-    public void setWhosTurn() {
-        this.whos_turn = this.whos_turn.equals(invitingPlayer) ? invitedPlayer : invitingPlayer;
-    }
-
+    /**
+     * Sets the ID of the message embed for the game.
+     *
+     * @param embedID the ID of the message embed for the game
+     */
     private void setEmbedID(String embedID) {
         this.embedID = embedID;
     }
 
+    /**
+     * Sets the player who's turn it is to play.
+     */
+    public void setWhosTurn() {
+        this.whos_turn = this.whos_turn.equals(invitingPlayer) ? invitedPlayer : invitingPlayer;
+    }
+
+    /**
+     * Gets the player who's turn it is to play.
+     *
+     * @return the player who's turn it is to play
+     */
     public User getWhosTurn() {
         return whos_turn;
     }
@@ -105,6 +120,11 @@ public class Game {
         setMessageID(event);
     }
 
+    /**
+     * Ends the game, sends a notification to both players, and removes the game from the game manager.
+     *
+     * @param winner the winner of the game
+     */
     public void endGame(User winner) {
         event.replyEmbeds(new EmbedBuilder()
                 .setTitle("Game Over!")
@@ -115,6 +135,9 @@ public class Game {
         gameManager.removeGame(invitingPlayer, invitedPlayer);
     }
 
+    /**
+     * Updates the game state based on the number of mistakes made.
+     */
     public HangmanLayout getCurrentLayout() {
         return switch (mistakes) {
             case 0 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_8 : HangmanLayout.EXERCISE_6;
@@ -147,6 +170,11 @@ public class Game {
         }, 0, 1000);
     }
 
+    /**
+     * Sets the ID of the message embed for the game after a delay.
+     *
+     * @param event the event associated with the command execution
+     */
     private void setMessageID(SlashCommandInteractionEvent event) {
         new Timer().schedule(new TimerTask() {
             @Override
@@ -166,27 +194,57 @@ public class Game {
         return elapsedTime > settings.getDefaultTimeLimit() * 1000L;
     }
 
+    /**
+     * Gets the word to guess in the game.
+     *
+     * @return the word to guess in the game
+     */
     public String getWordToGuess() {
         return wordToGuess;
     }
 
-    // create getter for inviting player and invited player:
+    /**
+     * Gets the player who initiated the game.
+     *
+     * @return the player who initiated the game
+     */
     public User getInvitingPlayer() {
         return invitingPlayer;
     }
 
+    /**
+     * Gets the player who was invited to join the game.
+     *
+     * @return the player who was invited to join the game
+     */
     public User getInvitedPlayer() {
         return invitedPlayer;
     }
 
+    /**
+     * Gets the player who starts the game.
+     *
+     * @return the player who starts the game
+     */
     public User getStartingPlayer() {
         return new Random().nextBoolean() ? invitingPlayer : invitedPlayer;
     }
 
+    /**
+     * Checks if the specified player is in the game.
+     *
+     * @param player the player to check
+     * @return true if the player is in the game, false otherwise
+     */
     public boolean isPlayer(User player) {
         return player.equals(invitingPlayer) || player.equals(invitedPlayer);
     }
 
+    /**
+     * Gets the maximum number of mistakes allowed in the game.
+     *
+     * @return the maximum number of mistakes allowed in the game
+     */
     public int getMaxMistakes() {
         return this.maxMistakes;
     }

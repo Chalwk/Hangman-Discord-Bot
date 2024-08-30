@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a command for accepting a game invite in the context of a game or a chat bot.
+ * Represents a command for accepting a game invite.
  */
 public class accept implements CommandInterface {
 

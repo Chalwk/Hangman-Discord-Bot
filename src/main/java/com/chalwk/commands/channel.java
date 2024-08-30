@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Represents a command for accepting a game invite in the context of a game
+ * Represents a command for setting or removing the channel for the Hangman bot to use.
  */
 public class channel implements CommandInterface {
 

@@ -15,6 +15,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a command for inviting a user to play a game.
+ */
 public class invite implements CommandInterface {
 
     /**
@@ -75,6 +78,8 @@ public class invite implements CommandInterface {
         User userToInvite = event.getOption("opponent").getAsUser();
         User invitingPlayer = event.getUser();
 
+        if (isSelf(event, userToInvite, invitingPlayer)) return;
+
         int layout;
         int layoutIndex = layoutOption.getAsInt();
         layout = switch (layoutIndex) {
@@ -86,5 +91,13 @@ public class invite implements CommandInterface {
         gameManager.invitePlayer(invitingPlayer, userToInvite, layout, event);
 
         COOLDOWN_MANAGER.setCooldown("invite", event.getUser());
+    }
+
+    private boolean isSelf(SlashCommandInteractionEvent event, User userToInvite, User invitingPlayer) {
+        if (userToInvite.getId().equals(invitingPlayer.getId())) {
+            event.reply("## You can't invite yourself to a game!").setEphemeral(true).queue();
+            return true;
+        }
+        return false;
     }
 }
