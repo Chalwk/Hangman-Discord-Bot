@@ -3,6 +3,7 @@
 package com.chalwk;
 
 import com.chalwk.bot.BotInitializer;
+import com.chalwk.game.GameManager;
 
 import java.io.IOException;
 

@@ -26,7 +26,6 @@ public class accept implements CommandInterface {
      * The game manager for managing game operations.
      */
     private final GameManager gameManager;
-
     /**
      * Initializes the accept command instance with the provided GameManager.
      *

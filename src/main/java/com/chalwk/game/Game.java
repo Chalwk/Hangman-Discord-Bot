@@ -73,29 +73,27 @@ public class Game {
      */
     public void startGame(SlashCommandInteractionEvent event) {
         this.startTime = new Date();
-//        event.replyEmbeds(new EmbedBuilder()
-//                .setTitle("New Game")
-//                .setDescription("A new game between " + invitingPlayer.getAsMention() + " and " + invitedPlayer.getAsMention() + " has started!")
-//                .setColor(Color.GREEN).build()).queue();
         scheduleGameEndTask();
 
+        String stage = getCurrentLayout().getLayout();
         event.replyEmbeds(new EmbedBuilder()
                 .setTitle("Hangman Game")
                 .addField("Players: ", invitingPlayer.getAsMention() + " VS " + invitedPlayer.getAsMention(), true)
                 .setFooter("Guess a letter or the word: " + wordToGuess.length() + " characters")
+                .addField("Stage: ", "```" + stage + "```", false)
                 .addField("Characters:", "```" + "〔 〕".repeat(wordToGuess.length()) + "```", false).build()).queue();
     }
 
     private HangmanLayout getCurrentLayout() {
         return switch (mistakes) {
-            case 0 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_1 : HangmanLayout.EXERCISE_1;
-            case 1 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_2 : HangmanLayout.EXERCISE_2;
-            case 2 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_3 : HangmanLayout.EXERCISE_3;
-            case 3 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_4 : HangmanLayout.EXERCISE_4;
-            case 4 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_5 : HangmanLayout.EXERCISE_5;
-            case 5 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_6 : HangmanLayout.EXERCISE_6;
-            case 6 -> HangmanLayout.GALLOWS_7;
-            case 7 -> HangmanLayout.GALLOWS_8;
+            case 0 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_8 : HangmanLayout.EXERCISE_6;
+            case 1 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_7 : HangmanLayout.EXERCISE_5;
+            case 2 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_6 : HangmanLayout.EXERCISE_4;
+            case 3 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_5 : HangmanLayout.EXERCISE_3;
+            case 4 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_4 : HangmanLayout.EXERCISE_2;
+            case 5 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_3 : HangmanLayout.EXERCISE_1;
+            case 6 -> HangmanLayout.GALLOWS_2;
+            case 7 -> HangmanLayout.GALLOWS_1;
             default -> throw new IllegalStateException("Unsupported layout stage [" + mistakes + "]");
         };
     }
@@ -128,5 +126,9 @@ public class Game {
     private boolean isTimeUp() {
         long elapsedTime = System.currentTimeMillis() - startTime.getTime();
         return elapsedTime > settings.getDefaultTimeLimit() * 1000L;
+    }
+
+    public String getWordToGuess() {
+        return wordToGuess;
     }
 }

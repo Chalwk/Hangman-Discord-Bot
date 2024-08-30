@@ -9,7 +9,6 @@ import com.chalwk.commands.accept;
 import com.chalwk.commands.decline;
 import com.chalwk.commands.invite;
 import com.chalwk.game.GameManager;
-import com.chalwk.util.WordList;
 import com.chalwk.util.authentication;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -19,7 +18,6 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * A class responsible for initializing and setting up the bot for the Virtual Pets game project.
@@ -30,6 +28,8 @@ public class BotInitializer {
      * An instance of the PetDataHandler class to manage pet data.
      */
     public static ShardManager shardManager;
+
+    public static GameManager gameManager = new GameManager();
     /**
      * The bot's authentication token.
      */
@@ -42,6 +42,10 @@ public class BotInitializer {
      */
     public BotInitializer() throws IOException {
         this.token = authentication.getToken();
+    }
+
+    public static GameManager getGameManager() {
+        return gameManager;
     }
 
     public static ShardManager getShardManager() {
@@ -73,8 +77,6 @@ public class BotInitializer {
      */
     private void registerCommands(ShardManager shardManager) {
         CommandListener commands = new CommandListener();
-
-        GameManager gameManager = new GameManager();
 
         commands.add(new invite(gameManager));
         commands.add(new accept(gameManager));
