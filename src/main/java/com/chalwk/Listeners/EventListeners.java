@@ -50,25 +50,40 @@ public class EventListeners extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
         User player = event.getAuthor();
-        if (player.isBot()) return;
+        if (player.isBot()) return; // ignore bots
 
         GameManager gameManager = getGameManager();
-        if (!gameManager.isInGame(player)) return;
+        if (!gameManager.isInGame(player)) return; // only players in a game can play
 
         Game game = gameManager.getGame(player);
+
+        if (!game.isPlayer(player)) return; // only the players in this specific game can play
+
+        User whos_turn = game.getWhosTurn();
+        if (!player.equals(whos_turn)) {
+            event.getMessage().delete().queue();
+            return;
+        }
+
         String word = game.getWordToGuess();
         String input = event.getMessage().getContentRaw().toLowerCase();
 
         if (input.length() > 1) {
-            if (input.contentEquals(word)) { // guessed the whole word
-                game.endGame(player);
+            if (input.contentEquals(word)) {
+                game.endGame(player); // guessed the whole word
             } else {
-                game.mistakes++;
+                game.mistakes++;  // incorrect guess
             }
         } else if (!getGuess(input, new StringBuilder(word), game)) {
-            game.mistakes++;
+            game.mistakes++; // incorrect guess
         }
 
+        if (game.mistakes >= game.getMaxMistakes()) {
+            game.endGame(game.getWhosTurn());
+            return;
+        }
+
+        game.setWhosTurn();
         updateEmbed(new StringBuilder(word), game, event);
     }
 }

@@ -43,16 +43,14 @@ public class GameManager {
      *
      * @param invitingPlayer the user who initiated the game
      * @param invitedPlayer  the user who was invited to join the game
-     * @param event the event that triggered the game creation
+     * @param event          the event that triggered the game creation
      */
     public void createGame(User invitingPlayer, User invitedPlayer, SlashCommandInteractionEvent event) {
-        if (!isInGame(invitingPlayer) && !isInGame(invitedPlayer)) {
-            int layout = pendingInvites.get(invitedPlayer).getLayout();
-            Game game = new Game(invitingPlayer, invitedPlayer, event, layout);
-            pendingInvites.remove(invitedPlayer);
-            games.put(invitingPlayer, game);
-            games.put(invitedPlayer, game);
-        }
+        int layout = pendingInvites.get(invitedPlayer).getLayout();
+        Game game = new Game(invitingPlayer, invitedPlayer, event, layout);
+        pendingInvites.remove(invitedPlayer);
+        games.put(invitingPlayer, game);
+        games.put(invitedPlayer, game);
     }
 
     /**
@@ -60,8 +58,8 @@ public class GameManager {
      *
      * @param invitingPlayer the user who initiated the game
      * @param invitedPlayer  the user who was invited to join the game
-     * @param layout the layout to use for the game
-     * @param event the event that triggered the invite
+     * @param layout         the layout to use for the game
+     * @param event          the event that triggered the invite
      */
     public void invitePlayer(User invitingPlayer, User invitedPlayer, int layout, SlashCommandInteractionEvent event) {
 
@@ -72,7 +70,7 @@ public class GameManager {
         embed.setTitle("Hangman Game Invite");
 
         if (!isInGame(invitingPlayer) && !isInGame(invitedPlayer)) {
-            pendingInvites.put(invitingPlayer, new GameInvite(invitingPlayer, invitedPlayer, layout));
+            pendingInvites.put(invitedPlayer, new GameInvite(invitingPlayer, invitedPlayer, layout));
             event.replyEmbeds(embed
                     .setDescription(invitingPlayer.getAsMention() + " has invited " + invitedPlayer.getAsMention() + " to play a game!")
                     .setFooter("Type /accept to join the game or /decline to decline the invite.")
@@ -90,10 +88,15 @@ public class GameManager {
      * Accepts a pending invite and creates a new game with the inviting and invited players.
      *
      * @param invitedPlayer the user who accepted the invite
-     * @param event the event that triggered the invite acceptance
+     * @param event         the event that triggered the invite acceptance
      */
     public void acceptInvite(User invitedPlayer, SlashCommandInteractionEvent event) {
-        User invitingPlayer = pendingInvites.get(invitedPlayer).getInvitingPlayer();
+        GameInvite invite = pendingInvites.get(invitedPlayer);
+        User invitingPlayer = invite.getInvitingPlayer();
+        if (isInGame(invitingPlayer)) {
+            event.reply(invitingPlayer.getName() + " is already in a game.\nPlease wait until their current game is finished.").setEphemeral(true).queue();
+            return;
+        }
         createGame(invitingPlayer, invitedPlayer, event);
     }
 
@@ -101,10 +104,11 @@ public class GameManager {
      * Declines a pending invite and notifies the inviting player.
      *
      * @param invitedPlayer the user who declined the invite
-     * @param event the event that triggered the invite decline
+     * @param event         the event that triggered the invite decline
      */
     public void declineInvite(User invitedPlayer, SlashCommandInteractionEvent event) {
-        User invitingPlayer = pendingInvites.get(invitedPlayer).getInvitingPlayer();
+        GameInvite invite = pendingInvites.get(invitedPlayer);
+        User invitingPlayer = invite.getInvitingPlayer();
         event.replyEmbeds(new EmbedBuilder()
                 .setTitle("Hangman Game Invite Declined")
                 .setDescription(invitedPlayer.getAsMention() + " has declined the invite from " + invitingPlayer.getAsMention() + "!")
@@ -121,7 +125,6 @@ public class GameManager {
         return pendingInvites;
     }
 
-    // Create a method that returns the game for a specific player:
     public Game getGame(User player) {
         return games.get(player);
     }

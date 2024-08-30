@@ -3,7 +3,9 @@
 
 package com.chalwk.game;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Guess {
 
@@ -14,10 +16,11 @@ public class Guess {
     }
 
     public static String showGuesses(List<Character> guesses) {
+        Set<Character> uniqueGuesses = new HashSet<>(guesses);
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < guesses.size(); i++) {
-            sb.append(guesses.get(i).toString().toUpperCase());
-            if (i != guesses.size() - 1) {
+        for (Character guess : uniqueGuesses) {
+            sb.append(guess.toString().toUpperCase());
+            if (uniqueGuesses.size() > 1) {
                 sb.append(", ");
             }
         }

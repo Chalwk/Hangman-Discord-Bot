@@ -64,9 +64,7 @@ public class accept implements CommandInterface {
         if (gameManager.isInGame(acceptingPlayer)) {
             event.reply("You are already in a game.").setEphemeral(true).queue();
             return;
-        }
-
-        if (gameManager.getPendingInvites().containsKey(acceptingPlayer)) {
+        } else if (gameManager.getPendingInvites().containsKey(acceptingPlayer)) {
             gameManager.acceptInvite(acceptingPlayer, event);
         } else {
             event.reply("You don't have any pending invites.").setEphemeral(true).queue();

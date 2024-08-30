@@ -33,6 +33,9 @@ public class Game {
     public int mistakes = 0;
     public List<Character> guesses = new ArrayList<>();
     private String embedID;
+    private User whos_turn;
+    private final int maxMistakes;
+
     /**
      * The start time of the game.
      */
@@ -52,6 +55,8 @@ public class Game {
         this.invitedPlayer = invitedPlayer;
         this.hangmanLayout = layout;
         this.wordToGuess = WordList.getRandomWord();
+        this.whos_turn = getStartingPlayer();
+        this.maxMistakes = layout == 0 ? 7 : 6;
         startGame(event);
     }
 
@@ -60,6 +65,7 @@ public class Game {
         return new EmbedBuilder()
                 .setTitle("\uD83D\uDD74 \uD80C\uDF6F Hangman \uD80C\uDF6F \uD83D\uDD74")
                 .addField("Players: ", game.getInvitingPlayer().getAsMention() + " VS " + game.getInvitedPlayer().getAsMention(), true)
+                .addField("Turn: ", game.getWhosTurn().getAsMention(), false)
                 .addField("Stage: ", "```" + stage + "```", false)
                 .addField("Characters:", guessBox != null ? guessBox : "```" + "〔 〕".repeat(game.getWordToGuess().length()) + "```", false)
                 .addField("Guesses: " + showGuesses(game.guesses), " ", false)
@@ -71,8 +77,16 @@ public class Game {
         return this.embedID;
     }
 
+    public void setWhosTurn() {
+        this.whos_turn = this.whos_turn.equals(invitingPlayer) ? invitedPlayer : invitingPlayer;
+    }
+
     private void setEmbedID(String embedID) {
         this.embedID = embedID;
+    }
+
+    public User getWhosTurn() {
+        return whos_turn;
     }
 
     /**
@@ -83,10 +97,7 @@ public class Game {
     public void startGame(SlashCommandInteractionEvent event) {
         this.startTime = new Date();
         scheduleGameEndTask();
-
-        EmbedBuilder embed = createGameEmbed(this, null);
-
-        event.replyEmbeds(embed.build()).queue();
+        event.replyEmbeds(createGameEmbed(this, null).build()).queue();
         setMessageID(event);
     }
 
@@ -162,5 +173,17 @@ public class Game {
 
     public User getInvitedPlayer() {
         return invitedPlayer;
+    }
+
+    public User getStartingPlayer() {
+        return new Random().nextBoolean() ? invitingPlayer : invitedPlayer;
+    }
+
+    public boolean isPlayer(User player) {
+        return player.equals(invitingPlayer) || player.equals(invitedPlayer);
+    }
+
+    public int getMaxMistakes() {
+        return this.maxMistakes;
     }
 }
