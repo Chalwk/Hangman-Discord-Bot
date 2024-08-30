@@ -19,10 +19,10 @@ import static com.chalwk.game.Guess.guessBox;
 
 public class EventListeners extends ListenerAdapter {
 
-    private static void updateEmbed(StringBuilder word, Game game, MessageReceivedEvent event) {
+    private static void updateEmbed(Game game, MessageReceivedEvent event) {
 
         event.getMessage().delete().queue();
-        String guess_box = guessBox(word, game);
+        String guess_box = guessBox(game);
 
         EmbedBuilder embed = createGameEmbed(game, guess_box);
         event.getChannel()
@@ -58,12 +58,7 @@ public class EventListeners extends ListenerAdapter {
         Game game = gameManager.getGame(player);
 
         if (!game.isPlayer(player)) return; // only the players in this specific game can play
-
-        User whos_turn = game.getWhosTurn();
-        if (!player.equals(whos_turn)) {
-            event.getMessage().delete().queue();
-            return;
-        }
+        if (notYourTurn(event, game, player)) return; // only the player whose turn it is can play
 
         String word = game.getWordToGuess();
         String input = event.getMessage().getContentRaw().toLowerCase();
@@ -74,16 +69,28 @@ public class EventListeners extends ListenerAdapter {
             } else {
                 game.mistakes++;  // incorrect guess
             }
-        } else if (!getGuess(input, new StringBuilder(word), game)) {
+        } else if (!getGuess(input, game)) {
             game.mistakes++; // incorrect guess
         }
 
         if (game.mistakes >= game.getMaxMistakes()) {
+            event.getMessage().delete().queue();
             game.endGame(game.getWhosTurn());
             return;
         }
 
         game.setWhosTurn();
-        updateEmbed(new StringBuilder(word), game, event);
+        updateEmbed(game, event);
+
+        // cancel command
+    }
+
+    private boolean notYourTurn(@NotNull MessageReceivedEvent event, Game game, User player) {
+        User whos_turn = game.getWhosTurn();
+        if (!player.equals(whos_turn)) {
+            event.getMessage().delete().queue();
+            return true;
+        }
+        return false;
     }
 }

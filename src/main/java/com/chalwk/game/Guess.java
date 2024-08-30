@@ -3,38 +3,35 @@
 
 package com.chalwk.game;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Guess {
-
-    public static boolean getGuess(String character, StringBuilder word, Game game) {
+    public static boolean getGuess(String character, Game game) {
         char guess = character.charAt(0);
         game.guesses.add(guess);
-        return word.toString().contains(character);
+        return game.getWordToGuess().contains(character);
     }
 
     public static String showGuesses(List<Character> guesses) {
         Set<Character> uniqueGuesses = new HashSet<>(guesses);
+        List<Character> sortedGuesses = new ArrayList<>(new TreeSet<>(uniqueGuesses));
         StringBuilder sb = new StringBuilder();
-        for (Character guess : uniqueGuesses) {
+        for (Character guess : sortedGuesses) {
             sb.append(guess.toString().toUpperCase());
-            if (uniqueGuesses.size() > 1) {
+            if (sortedGuesses.size() > 1) {
                 sb.append(", ");
             }
         }
         return sb.toString();
     }
 
-    public static String guessBox(StringBuilder word, Game game) {
+    public static String guessBox(Game game) {
+        String word = game.getWordToGuess();
         StringBuilder sb = new StringBuilder();
         sb.append("```");
-        game.mistakes = 0;
         for (int i = 0; i < word.length(); i++) {
             char guess = word.charAt(i);
             if (game.guesses.contains(guess)) {
-                game.mistakes++;
                 sb.append("〔").append(guess).append("〕");
             } else {
                 sb.append("〔 〕");

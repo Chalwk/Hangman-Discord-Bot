@@ -7,21 +7,21 @@ import java.util.EnumMap;
 
 public enum HangmanLayout {
 
-    GALLOWS_1(0),
-    GALLOWS_2(1),
-    GALLOWS_3(2),
-    GALLOWS_4(3),
-    GALLOWS_5(4),
-    GALLOWS_6(5),
-    GALLOWS_7(6),
-    GALLOWS_8(7),
+    GALLOWS_1,
+    GALLOWS_2,
+    GALLOWS_3,
+    GALLOWS_4,
+    GALLOWS_5,
+    GALLOWS_6,
+    GALLOWS_7,
+    GALLOWS_8,
 
-    EXERCISE_1(0),
-    EXERCISE_2(1),
-    EXERCISE_3(2),
-    EXERCISE_4(3),
-    EXERCISE_5(4),
-    EXERCISE_6(5);
+    EXERCISE_1,
+    EXERCISE_2,
+    EXERCISE_3,
+    EXERCISE_4,
+    EXERCISE_5,
+    EXERCISE_6;
 
     private static final EnumMap<HangmanLayout, String> LAYOUTS = new EnumMap<>(HangmanLayout.class);
 
@@ -137,12 +137,6 @@ public enum HangmanLayout {
                     \\| |/
                 []--+=-=+--[]
                 """);
-    }
-
-    private final int layoutIndex;
-
-    HangmanLayout(int layoutIndex) {
-        this.layoutIndex = layoutIndex;
     }
 
     public String getLayout() {

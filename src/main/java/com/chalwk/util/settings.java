@@ -3,11 +3,35 @@
 
 package com.chalwk.util;
 
+import com.chalwk.game.GameManager;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
 public class settings {
 
     public static final int DEFAULT_TIME_LIMIT = 300;
 
     public static int getDefaultTimeLimit() {
         return DEFAULT_TIME_LIMIT;
+    }
+
+    public static boolean notCorrectChannel(SlashCommandInteractionEvent event) {
+        String thisChannel = event.getChannel().getId();
+        String requiredChannel = GameManager.getChannelID();
+
+        if (requiredChannel.isEmpty()) {
+            event.reply("Please set the channel for Hangman to use first").setEphemeral(true).queue();
+            return true;
+        } else if (!thisChannel.equals(requiredChannel)) {
+            Channel channel = event.getGuild().getTextChannelById(requiredChannel);
+
+            if (channel != null) {
+                event.reply("Hangman only works in " + channel).setEphemeral(true).queue();
+            } else {
+                event.reply("The required channel is not available").setEphemeral(true).queue();
+            }
+            return true;
+        }
+        return false;
     }
 }

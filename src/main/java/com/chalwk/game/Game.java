@@ -6,12 +6,14 @@ import com.chalwk.util.WordList;
 import com.chalwk.util.settings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import static com.chalwk.bot.BotInitializer.getShardManager;
 import static com.chalwk.game.Guess.showGuesses;
 
 /**
@@ -35,6 +37,7 @@ public class Game {
     private String embedID;
     private User whos_turn;
     private final int maxMistakes;
+    private final GameManager gameManager;
 
     /**
      * The start time of the game.
@@ -49,7 +52,7 @@ public class Game {
      * @param event          the event that triggered the game creation
      * @param layout         the layout of the hangman game
      */
-    public Game(User invitingPlayer, User invitedPlayer, SlashCommandInteractionEvent event, int layout) {
+    public Game(User invitingPlayer, User invitedPlayer, SlashCommandInteractionEvent event, int layout, GameManager gameManager) {
         this.event = event;
         this.invitingPlayer = invitingPlayer;
         this.invitedPlayer = invitedPlayer;
@@ -57,6 +60,7 @@ public class Game {
         this.wordToGuess = WordList.getRandomWord();
         this.whos_turn = getStartingPlayer();
         this.maxMistakes = layout == 0 ? 7 : 6;
+        this.gameManager = gameManager;
         startGame(event);
     }
 
@@ -107,10 +111,12 @@ public class Game {
                 .setDescription("The game between " + invitingPlayer.getName() + " and " + invitedPlayer.getName() + " has ended!")
                 .addField("Winner: ", winner.getAsMention(), true)
                 .setColor(Color.BLUE).build()).queue();
+
+        gameManager.removeGame(invitingPlayer, invitedPlayer);
     }
 
     public HangmanLayout getCurrentLayout() {
-        return switch (this.mistakes) {
+        return switch (mistakes) {
             case 0 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_8 : HangmanLayout.EXERCISE_6;
             case 1 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_7 : HangmanLayout.EXERCISE_5;
             case 2 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_6 : HangmanLayout.EXERCISE_4;
@@ -119,7 +125,7 @@ public class Game {
             case 5 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_3 : HangmanLayout.EXERCISE_1;
             case 6 -> HangmanLayout.GALLOWS_2;
             case 7 -> HangmanLayout.GALLOWS_1;
-            default -> throw new IllegalStateException("Unsupported layout stage [" + this.mistakes + "]");
+            default -> throw new IllegalStateException("Unsupported layout stage [" + mistakes + "]");
         };
     }
 
@@ -133,12 +139,10 @@ public class Game {
             public void run() {
                 if (isTimeUp()) {
                     this.cancel();
-                    event.replyEmbeds(new EmbedBuilder()
-                            .setTitle("Times up!")
-                            .setDescription("Game between " + invitingPlayer.getName() + " and " + invitedPlayer.getName() + " has ended!")
-                            .setColor(Color.GREEN).build()).queue();
+                    String channelID = GameManager.getChannelID();
+                    TextChannel channel = getShardManager().getTextChannelById(channelID);
+                    channel.sendMessage("Times up! Game between " + invitingPlayer.getAsMention() + " and " + invitedPlayer.getAsMention() + " has ended!").queue();
                 }
-                // todo: Create checkGameState() (or checkForWinner()) method to check if a player has won the game
             }
         }, 0, 1000);
     }

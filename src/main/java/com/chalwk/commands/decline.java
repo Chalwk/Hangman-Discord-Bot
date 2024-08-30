@@ -5,6 +5,7 @@ package com.chalwk.commands;
 import com.chalwk.CommandManager.CommandCooldownManager;
 import com.chalwk.CommandManager.CommandInterface;
 import com.chalwk.game.GameManager;
+import com.chalwk.util.settings;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -56,6 +57,8 @@ public class decline implements CommandInterface {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         if (COOLDOWN_MANAGER.isOnCooldown(event)) return;
+
+        if (settings.notCorrectChannel(event)) return;
 
         User decliningPlayer = event.getUser();
 

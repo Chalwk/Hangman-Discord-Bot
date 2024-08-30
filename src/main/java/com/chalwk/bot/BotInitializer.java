@@ -6,10 +6,10 @@ package com.chalwk.bot;
 import com.chalwk.CommandManager.CommandListener;
 import com.chalwk.Listeners.EventListeners;
 import com.chalwk.commands.accept;
+import com.chalwk.commands.channel;
 import com.chalwk.commands.decline;
 import com.chalwk.commands.invite;
 import com.chalwk.game.GameManager;
-import com.chalwk.util.WordList;
 import com.chalwk.util.authentication;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -85,6 +85,7 @@ public class BotInitializer {
         commands.add(new invite(gameManager));
         commands.add(new accept(gameManager));
         commands.add(new decline(gameManager));
+        commands.add(new channel(gameManager));
         shardManager.addEventListener(commands);
     }
 }
