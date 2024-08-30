@@ -34,6 +34,7 @@ public class Game {
     private String embedID;
     private User whos_turn;
     private Date startTime;
+    private TimerTask gameEndTask;
 
     /**
      * Creates a new Game instance for the specified players, event, and layout.
@@ -130,7 +131,7 @@ public class Game {
     public void endGame(User winner, String nobody) {
         String channelID = GameManager.getChannelID();
         TextChannel channel = getShardManager().getTextChannelById(channelID);
-
+        cancelGameEndTask();
         String result = nobody != null ? nobody : winner.getAsMention();
 
         channel.sendMessageEmbeds(new EmbedBuilder()
@@ -163,8 +164,10 @@ public class Game {
      * Schedules a task to end the game when the default time limit is reached.
      */
     private void scheduleGameEndTask() {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        if (gameEndTask != null) {
+            gameEndTask.cancel();
+        }
+        gameEndTask = new TimerTask() {
             @Override
             public void run() {
                 if (isTimeUp()) {
@@ -174,7 +177,10 @@ public class Game {
                     channel.sendMessage("Times up! Game between " + invitingPlayer.getAsMention() + " and " + invitedPlayer.getAsMention() + " has ended!").queue();
                 }
             }
-        }, 0, 1000);
+        };
+
+        Timer gameEndTimer = new Timer();
+        gameEndTimer.scheduleAtFixedRate(gameEndTask, 0, 1000);
     }
 
     /**
@@ -245,6 +251,13 @@ public class Game {
      */
     public boolean isPlayer(User player) {
         return player.equals(invitingPlayer) || player.equals(invitedPlayer);
+    }
+
+    private void cancelGameEndTask() {
+        if (gameEndTask != null) {
+            gameEndTask.cancel();
+            gameEndTask = null;
+        }
     }
 
     /**
