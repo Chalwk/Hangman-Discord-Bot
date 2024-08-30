@@ -93,10 +93,14 @@ public class GameManager {
     public void acceptInvite(User invitedPlayer, SlashCommandInteractionEvent event) {
         User invitingPlayer = pendingInvites.get(invitedPlayer).getInvitingPlayer();
         createGame(invitingPlayer, invitedPlayer, event);
-        event.replyEmbeds(new EmbedBuilder()
-                .setTitle("Hangman Game Invite Accepted")
-                .setDescription(invitedPlayer.getAsMention() + " has accepted the invite from " + invitingPlayer.getAsMention() + "!")
-                .setColor(Color.GREEN).build()).queue();
+
+        // Don't send a message to the inviting player since they already know the invite was accepted.
+        // Also, JDA will only let us send one response to Discord, and since startGame() is called after a
+        // user accepts an invitation, we don't need to send a separate message here, as we're sending one in startGame().
+//        event.replyEmbeds(new EmbedBuilder()
+//                .setTitle("Hangman Game Invite Accepted")
+//                .setDescription(invitedPlayer.getAsMention() + " has accepted the invite from " + invitingPlayer.getAsMention() + "!")
+//                .setColor(Color.GREEN).build()).queue();
     }
 
     /**

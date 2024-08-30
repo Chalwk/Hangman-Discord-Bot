@@ -15,7 +15,7 @@ import java.util.List;
 
 public class WordList {
 
-    private final List<String> wordList;
+    private static List<String> wordList;
 
     public WordList() {
         wordList = new ArrayList<>();
@@ -46,7 +46,7 @@ public class WordList {
         return wordList.contains(word);
     }
 
-    public String getRandomWord() {
+    public static String getRandomWord() {
         return wordList.get((int) (Math.random() * wordList.size()));
     }
 

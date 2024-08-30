@@ -2,6 +2,7 @@
    See the LICENSE file or visit https://www.gnu.org/licenses/gpl-3.0.en.html for details. */
 package com.chalwk.game;
 
+import com.chalwk.util.WordList;
 import com.chalwk.util.settings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
@@ -38,6 +39,9 @@ public class Game {
 
     private int mistakes = 0;
 
+    private final String wordToGuess;
+    private WordList wordList;
+
     /**
      * Creates a new Game instance for the specified players and assigns a GameManager.
      *
@@ -51,6 +55,11 @@ public class Game {
         this.invitingPlayer = invitingPlayer;
         this.invitedPlayer = invitedPlayer;
         this.hangmanLayout = layout;
+
+        wordList = new WordList();
+
+        this.wordToGuess = WordList.getRandomWord();
+
         startGame(event);
 
 //        HangmanLayout currentLayout = getCurrentLayout();
@@ -64,11 +73,17 @@ public class Game {
      */
     public void startGame(SlashCommandInteractionEvent event) {
         this.startTime = new Date();
-        event.replyEmbeds(new EmbedBuilder()
-                .setTitle("New Game")
-                .setDescription("A new game between " + invitingPlayer.getAsMention() + " and " + invitedPlayer.getAsMention() + " has started!")
-                .setColor(Color.GREEN).build()).queue();
+//        event.replyEmbeds(new EmbedBuilder()
+//                .setTitle("New Game")
+//                .setDescription("A new game between " + invitingPlayer.getAsMention() + " and " + invitedPlayer.getAsMention() + " has started!")
+//                .setColor(Color.GREEN).build()).queue();
         scheduleGameEndTask();
+
+        event.replyEmbeds(new EmbedBuilder()
+                .setTitle("Hangman Game")
+                .addField("Players: ", invitingPlayer.getAsMention() + " VS " + invitedPlayer.getAsMention(), true)
+                .setFooter("Guess a letter or the word: " + wordToGuess.length() + " characters")
+                .addField("Characters:", "```" + "〔 〕".repeat(wordToGuess.length()) + "```", false).build()).queue();
     }
 
     private HangmanLayout getCurrentLayout() {
