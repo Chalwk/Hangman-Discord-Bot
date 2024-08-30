@@ -29,10 +29,6 @@ import java.util.stream.Stream;
 public class channel implements CommandInterface {
 
     private static final String configFile = "/config.txt";
-    private static final Path externalFilePath = Paths.get(configFile);
-    /**
-     * The cooldown manager for the command.
-     */
     private static final CommandCooldownManager COOLDOWN_MANAGER = new CommandCooldownManager();
     private final GameManager gameManager;
 
