@@ -11,6 +11,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.chalwk.util.fileIO.loadChannelID;
+
 /**
  * Manages game-related operations, including creating games, inviting players, and managing pending invites.
  */
@@ -24,6 +26,9 @@ public class GameManager {
      * Initializes an empty map for storing active games and pending invites.
      */
     public GameManager() {
+
+        channelID = loadChannelID();
+
         new WordList();
         this.games = new HashMap<>();
         this.pendingInvites = new HashMap<>();
@@ -145,5 +150,13 @@ public class GameManager {
     public void removeGame(User invitingPlayer, User invitedPlayer) {
         this.getGames().remove(invitingPlayer);
         this.getGames().remove(invitedPlayer);
+    }
+
+    public void cancelInvite(User invitingPlayer) {
+        pendingInvites.remove(invitingPlayer);
+    }
+
+    public String getInvitee(User invitingPlayer) {
+        return pendingInvites.get(invitingPlayer).getInvitedPlayer().getAsMention();
     }
 }

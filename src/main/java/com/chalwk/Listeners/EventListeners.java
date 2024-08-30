@@ -14,17 +14,14 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.chalwk.bot.BotInitializer.getGameManager;
 import static com.chalwk.game.Game.createGameEmbed;
+import static com.chalwk.game.Guess.formatGuessBox;
 import static com.chalwk.game.Guess.getGuess;
-import static com.chalwk.game.Guess.guessBox;
 
 public class EventListeners extends ListenerAdapter {
 
-    private static void updateEmbed(Game game, MessageReceivedEvent event) {
-
+    private static void updateEmbed(Game game, MessageReceivedEvent event, String guesses) {
         event.getMessage().delete().queue();
-        String guess_box = guessBox(game);
-
-        EmbedBuilder embed = createGameEmbed(game, guess_box);
+        EmbedBuilder embed = createGameEmbed(game, guesses);
         event.getChannel()
                 .retrieveMessageById(game.getEmbedID())
                 .queue(message -> message.editMessageEmbeds(embed.build()).queue());
@@ -65,7 +62,8 @@ public class EventListeners extends ListenerAdapter {
 
         if (input.length() > 1) {
             if (input.contentEquals(word)) {
-                game.endGame(player); // guessed the whole word
+                game.endGame(player, null); // guessed the whole word
+                return;
             } else {
                 game.mistakes++;  // incorrect guess
             }
@@ -75,14 +73,19 @@ public class EventListeners extends ListenerAdapter {
 
         if (game.mistakes >= game.getMaxMistakes()) {
             event.getMessage().delete().queue();
-            game.endGame(game.getWhosTurn());
+            game.endGame(player, "Nobody. You lost! The word was: " + word);
+            return;
+        }
+
+        String guess_box = formatGuessBox(game);
+        if (word.length() == game.correctGuesses) {
+            event.getMessage().delete().queue();
+            game.endGame(player, null);
             return;
         }
 
         game.setWhosTurn();
-        updateEmbed(game, event);
-
-        // cancel command
+        updateEmbed(game, event, guess_box);
     }
 
     private boolean notYourTurn(@NotNull MessageReceivedEvent event, Game game, User player) {

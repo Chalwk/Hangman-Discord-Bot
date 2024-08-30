@@ -25,13 +25,15 @@ public class Guess {
         return sb.toString();
     }
 
-    public static String guessBox(Game game) {
+    public static String formatGuessBox(Game game) {
         String word = game.getWordToGuess();
         StringBuilder sb = new StringBuilder();
         sb.append("```");
+        game.correctGuesses = 0;
         for (int i = 0; i < word.length(); i++) {
             char guess = word.charAt(i);
             if (game.guesses.contains(guess)) {
+                game.correctGuesses++;
                 sb.append("〔").append(guess).append("〕");
             } else {
                 sb.append("〔 〕");

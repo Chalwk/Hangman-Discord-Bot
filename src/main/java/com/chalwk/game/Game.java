@@ -29,6 +29,7 @@ public class Game {
     private final int maxMistakes;
     private final GameManager gameManager;
     public int mistakes = 0;
+    public int correctGuesses = 0;
     public List<Character> guesses = new ArrayList<>();
     private String embedID;
     private User whos_turn;
@@ -51,6 +52,7 @@ public class Game {
         this.whos_turn = getStartingPlayer();
         this.maxMistakes = layout == 0 ? 7 : 6;
         this.gameManager = gameManager;
+        this.correctGuesses = 0;
         startGame(event);
     }
 
@@ -93,16 +95,16 @@ public class Game {
     }
 
     /**
-     * Sets the player who's turn it is to play.
+     * Sets the player whose turn it is to play.
      */
     public void setWhosTurn() {
         this.whos_turn = this.whos_turn.equals(invitingPlayer) ? invitedPlayer : invitingPlayer;
     }
 
     /**
-     * Gets the player who's turn it is to play.
+     * Gets the player whose turn it is to play.
      *
-     * @return the player who's turn it is to play
+     * @return the player whose turn it is to play
      */
     public User getWhosTurn() {
         return whos_turn;
@@ -125,11 +127,16 @@ public class Game {
      *
      * @param winner the winner of the game
      */
-    public void endGame(User winner) {
-        event.replyEmbeds(new EmbedBuilder()
+    public void endGame(User winner, String nobody) {
+        String channelID = GameManager.getChannelID();
+        TextChannel channel = getShardManager().getTextChannelById(channelID);
+
+        String result = nobody != null ? nobody : winner.getAsMention();
+
+        channel.sendMessageEmbeds(new EmbedBuilder()
                 .setTitle("Game Over!")
                 .setDescription("The game between " + invitingPlayer.getName() + " and " + invitedPlayer.getName() + " has ended!")
-                .addField("Winner: ", winner.getAsMention(), true)
+                .addField("Winner: ", result, true)
                 .setColor(Color.BLUE).build()).queue();
 
         gameManager.removeGame(invitingPlayer, invitedPlayer);

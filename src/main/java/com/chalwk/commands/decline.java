@@ -72,6 +72,6 @@ public class decline implements CommandInterface {
 
         gameManager.declineInvite(decliningPlayer, event);
 
-        COOLDOWN_MANAGER.setCooldown("decline", event.getUser());
+        COOLDOWN_MANAGER.setCooldown(getName(), event.getUser());
     }
 }

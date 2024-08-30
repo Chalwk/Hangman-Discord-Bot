@@ -78,7 +78,7 @@ public class invite implements CommandInterface {
         User userToInvite = event.getOption("opponent").getAsUser();
         User invitingPlayer = event.getUser();
 
-        if (isSelf(event, userToInvite, invitingPlayer)) return;
+        //if (isSelf(event, userToInvite, invitingPlayer)) return;
 
         int layout;
         int layoutIndex = layoutOption.getAsInt();
@@ -90,7 +90,7 @@ public class invite implements CommandInterface {
 
         gameManager.invitePlayer(invitingPlayer, userToInvite, layout, event);
 
-        COOLDOWN_MANAGER.setCooldown("invite", event.getUser());
+        COOLDOWN_MANAGER.setCooldown(getName(), event.getUser());
     }
 
     private boolean isSelf(SlashCommandInteractionEvent event, User userToInvite, User invitingPlayer) {

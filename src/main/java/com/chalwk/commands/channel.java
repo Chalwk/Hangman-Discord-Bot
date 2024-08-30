@@ -5,7 +5,6 @@ package com.chalwk.commands;
 import com.chalwk.CommandManager.CommandCooldownManager;
 import com.chalwk.CommandManager.CommandInterface;
 import com.chalwk.game.GameManager;
-import com.chalwk.util.Logging.Logger;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -13,15 +12,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+
+import static com.chalwk.util.fileIO.isChannelIdConfigured;
+import static com.chalwk.util.fileIO.saveChannelID;
 
 /**
  * Represents a command for setting or removing the channel for the Hangman bot to use.
@@ -92,7 +87,7 @@ public class channel implements CommandInterface {
             }
         }
 
-        saveChannelID(channelID, isAddOperation, event);
+        saveChannelID(channelID, isAddOperation, event, gameManager);
 
         COOLDOWN_MANAGER.setCooldown(getName(), event.getUser());
     }
@@ -107,40 +102,5 @@ public class channel implements CommandInterface {
             return true;
         }
         return false;
-    }
-
-    private boolean isChannelIdConfigured(String channelID) {
-        try (Stream<String> lines = Files.lines(Paths.get(getClass().getResource(configFile).toURI()))) {
-            return lines.anyMatch(line -> line.trim().equals(channelID));
-        } catch (IOException | URISyntaxException e) {
-            Logger.info("Failed to read data: " + e.getMessage());
-            return false;
-        }
-    }
-
-    private void saveChannelID(String channelID, boolean isAddOperation, SlashCommandInteractionEvent event) {
-        try {
-            URI fileUri = getClass().getResource(configFile).toURI();
-            Path filePath = Paths.get(fileUri);
-            List<String> lines = Files.readAllLines(filePath);
-
-            if (isAddOperation) {
-                lines.add(channelID);
-                event.reply("## Channel ID saved!").setEphemeral(true).queue();
-                gameManager.setChannelID(channelID);
-            } else {
-                lines.removeIf(line -> line.trim().equals(channelID));
-                event.reply("## Channel ID removed!").setEphemeral(true).queue();
-                gameManager.setChannelID("");
-            }
-
-            Files.writeString(filePath, String.join("\n", lines));
-        } catch (URISyntaxException e) {
-            Logger.info("Failed to parse file URI: " + e.getMessage());
-            event.reply("## Failed to read data from the config file!").setEphemeral(true).queue();
-        } catch (IOException e) {
-            Logger.info("Failed to read data: " + e.getMessage());
-            event.reply("## Failed to save channel ID!").setEphemeral(true).queue();
-        }
     }
 }
