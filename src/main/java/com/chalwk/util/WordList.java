@@ -42,15 +42,7 @@ public class WordList {
         }
     }
 
-    public boolean containsWord(String word) {
-        return wordList.contains(word);
-    }
-
     public static String getRandomWord() {
         return wordList.get((int) (Math.random() * wordList.size()));
-    }
-
-    public List<String> getWordList() {
-        return wordList;
     }
 }

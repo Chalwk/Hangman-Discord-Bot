@@ -9,6 +9,7 @@ import com.chalwk.commands.accept;
 import com.chalwk.commands.decline;
 import com.chalwk.commands.invite;
 import com.chalwk.game.GameManager;
+import com.chalwk.util.WordList;
 import com.chalwk.util.authentication;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -29,7 +30,8 @@ public class BotInitializer {
      */
     public static ShardManager shardManager;
 
-    public static GameManager gameManager = new GameManager();
+    public static GameManager gameManager;
+
     /**
      * The bot's authentication token.
      */
@@ -56,6 +58,9 @@ public class BotInitializer {
      * Initializes the bot and sets up event listeners and commands.
      */
     public void initializeBot() {
+
+        gameManager = new GameManager();
+
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(this.token)
                 .setStatus(OnlineStatus.ONLINE)
                 .setActivity(Activity.playing("GAME"))
@@ -77,7 +82,6 @@ public class BotInitializer {
      */
     private void registerCommands(ShardManager shardManager) {
         CommandListener commands = new CommandListener();
-
         commands.add(new invite(gameManager));
         commands.add(new accept(gameManager));
         commands.add(new decline(gameManager));

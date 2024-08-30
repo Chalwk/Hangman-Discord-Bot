@@ -5,6 +5,7 @@ package com.chalwk.Listeners;
 
 import com.chalwk.game.Game;
 import com.chalwk.game.GameManager;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -12,8 +13,23 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import static com.chalwk.bot.BotInitializer.getGameManager;
+import static com.chalwk.game.Game.createGameEmbed;
+import static com.chalwk.game.Guess.getGuess;
+import static com.chalwk.game.Guess.guessBox;
 
 public class EventListeners extends ListenerAdapter {
+
+    private static void updateEmbed(StringBuilder word, Game game, MessageReceivedEvent event) {
+
+        event.getMessage().delete().queue();
+        String guess_box = guessBox(word, game);
+
+        EmbedBuilder embed = createGameEmbed(game, guess_box);
+        event.getChannel()
+                .retrieveMessageById(game.getEmbedID())
+                .queue(message -> message.editMessageEmbeds(embed.build()).queue());
+    }
+
 
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
@@ -34,14 +50,25 @@ public class EventListeners extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
         User player = event.getAuthor();
+        if (player.isBot()) return;
 
         GameManager gameManager = getGameManager();
+        if (!gameManager.isInGame(player)) return;
 
-        System.out.println("Checking if " + player.getName() + " is in a game... " + gameManager.isInGame(player));
+        Game game = gameManager.getGame(player);
+        String word = game.getWordToGuess();
+        String input = event.getMessage().getContentRaw().toLowerCase();
 
-        if (gameManager.isInGame(player)) {
-            Game game = gameManager.getGame(player);
-            System.out.println("Word to guess for this game is " + game.getWordToGuess());
+        if (input.length() > 1) {
+            if (input.contentEquals(word)) { // guessed the whole word
+                game.endGame(player);
+            } else {
+                game.mistakes++;
+            }
+        } else if (!getGuess(input, new StringBuilder(word), game)) {
+            game.mistakes++;
         }
+
+        updateEmbed(new StringBuilder(word), game, event);
     }
 }

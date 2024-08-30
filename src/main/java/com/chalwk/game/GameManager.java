@@ -2,6 +2,7 @@
    See the LICENSE file or visit https://www.gnu.org/licenses/gpl-3.0.en.html for details. */
 package com.chalwk.game;
 
+import com.chalwk.util.WordList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,6 +23,7 @@ public class GameManager {
      * Initializes an empty map for storing active games and pending invites.
      */
     public GameManager() {
+        new WordList();
         this.games = new HashMap<>();
         this.pendingInvites = new HashMap<>();
     }

@@ -9,11 +9,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
+import java.util.*;
 
-import static com.chalwk.game.HangmanLayout.*;
+import static com.chalwk.game.Guess.showGuesses;
 
 /**
  * Represents a game between two players, managing game-related operations such as starting a game and scheduling game end tasks.
@@ -28,22 +27,19 @@ public class Game {
      * The user who was invited to join the game.
      */
     private final User invitedPlayer;
+    private final SlashCommandInteractionEvent event;
+    private final int hangmanLayout;
+    private final String wordToGuess;
+    public int mistakes = 0;
+    public List<Character> guesses = new ArrayList<>();
+    private String embedID;
     /**
      * The start time of the game.
      */
     private Date startTime;
 
-    private final SlashCommandInteractionEvent event;
-
-    private final int hangmanLayout;
-
-    private int mistakes = 0;
-
-    private final String wordToGuess;
-    private WordList wordList;
-
     /**
-     * Creates a new Game instance for the specified players and assigns a GameManager.
+     * Creates a new Game instance for the specified players, event, and layout.
      *
      * @param invitingPlayer the user who initiated the game
      * @param invitedPlayer  the user who was invited to join the game
@@ -55,37 +51,55 @@ public class Game {
         this.invitingPlayer = invitingPlayer;
         this.invitedPlayer = invitedPlayer;
         this.hangmanLayout = layout;
-
-        wordList = new WordList();
-
         this.wordToGuess = WordList.getRandomWord();
-
         startGame(event);
+    }
 
-//        HangmanLayout currentLayout = getCurrentLayout();
-//        String layoutGraphic = currentLayout.getLayout();
-//        System.out.println(layoutGraphic);
+    public static EmbedBuilder createGameEmbed(Game game, String guessBox) {
+        String stage = game.getCurrentLayout().getLayout();
+        return new EmbedBuilder()
+                .setTitle("\uD83D\uDD74 \uD80C\uDF6F Hangman \uD80C\uDF6F \uD83D\uDD74")
+                .addField("Players: ", game.getInvitingPlayer().getAsMention() + " VS " + game.getInvitedPlayer().getAsMention(), true)
+                .addField("Stage: ", "```" + stage + "```", false)
+                .addField("Characters:", guessBox != null ? guessBox : "```" + "〔 〕".repeat(game.getWordToGuess().length()) + "```", false)
+                .addField("Guesses: " + showGuesses(game.guesses), " ", false)
+                .setFooter("Guess a letter or the word: " + game.getWordToGuess().length() + " characters")
+                .setColor(Color.BLUE);
+    }
+
+    public String getEmbedID() {
+        return this.embedID;
+    }
+
+    private void setEmbedID(String embedID) {
+        this.embedID = embedID;
     }
 
     /**
      * Starts the game, sends a notification to both players, and schedules the game end task.
+     *
      * @param event the event that triggered the game start
      */
     public void startGame(SlashCommandInteractionEvent event) {
         this.startTime = new Date();
         scheduleGameEndTask();
 
-        String stage = getCurrentLayout().getLayout();
-        event.replyEmbeds(new EmbedBuilder()
-                .setTitle("Hangman Game")
-                .addField("Players: ", invitingPlayer.getAsMention() + " VS " + invitedPlayer.getAsMention(), true)
-                .setFooter("Guess a letter or the word: " + wordToGuess.length() + " characters")
-                .addField("Stage: ", "```" + stage + "```", false)
-                .addField("Characters:", "```" + "〔 〕".repeat(wordToGuess.length()) + "```", false).build()).queue();
+        EmbedBuilder embed = createGameEmbed(this, null);
+
+        event.replyEmbeds(embed.build()).queue();
+        setMessageID(event);
     }
 
-    private HangmanLayout getCurrentLayout() {
-        return switch (mistakes) {
+    public void endGame(User winner) {
+        event.replyEmbeds(new EmbedBuilder()
+                .setTitle("Game Over!")
+                .setDescription("The game between " + invitingPlayer.getName() + " and " + invitedPlayer.getName() + " has ended!")
+                .addField("Winner: ", winner.getAsMention(), true)
+                .setColor(Color.BLUE).build()).queue();
+    }
+
+    public HangmanLayout getCurrentLayout() {
+        return switch (this.mistakes) {
             case 0 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_8 : HangmanLayout.EXERCISE_6;
             case 1 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_7 : HangmanLayout.EXERCISE_5;
             case 2 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_6 : HangmanLayout.EXERCISE_4;
@@ -94,7 +108,7 @@ public class Game {
             case 5 -> hangmanLayout == 0 ? HangmanLayout.GALLOWS_3 : HangmanLayout.EXERCISE_1;
             case 6 -> HangmanLayout.GALLOWS_2;
             case 7 -> HangmanLayout.GALLOWS_1;
-            default -> throw new IllegalStateException("Unsupported layout stage [" + mistakes + "]");
+            default -> throw new IllegalStateException("Unsupported layout stage [" + this.mistakes + "]");
         };
     }
 
@@ -118,6 +132,15 @@ public class Game {
         }, 0, 1000);
     }
 
+    private void setMessageID(SlashCommandInteractionEvent event) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                setEmbedID(event.getChannel().getLatestMessageId());
+            }
+        }, 500);
+    }
+
     /**
      * Checks if the default time limit for the game has been exceeded.
      *
@@ -130,5 +153,14 @@ public class Game {
 
     public String getWordToGuess() {
         return wordToGuess;
+    }
+
+    // create getter for inviting player and invited player:
+    public User getInvitingPlayer() {
+        return invitingPlayer;
+    }
+
+    public User getInvitedPlayer() {
+        return invitedPlayer;
     }
 }
