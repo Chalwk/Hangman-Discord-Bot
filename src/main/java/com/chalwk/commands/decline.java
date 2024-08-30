@@ -63,7 +63,7 @@ public class decline implements CommandInterface {
         User decliningPlayer = event.getUser();
 
         if (!gameManager.getPendingInvites().containsKey(decliningPlayer)) {
-            event.reply("You don't have any pending invites.").setEphemeral(true).queue();
+            event.reply("## You don't have any pending invites.").setEphemeral(true).queue();
             return;
         }
 

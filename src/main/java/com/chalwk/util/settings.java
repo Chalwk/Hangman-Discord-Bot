@@ -20,7 +20,11 @@ public class settings {
         String requiredChannel = GameManager.getChannelID();
 
         if (requiredChannel.isEmpty()) {
-            event.reply("Please set the channel for Hangman to use first").setEphemeral(true).queue();
+            event.reply("""
+                    # Hangman is not set up.
+                    Please set the channel for Hangman to use first.
+                    Ask an admin to use the `/setchannel` command.
+                    """).setEphemeral(true).queue();
             return true;
         } else if (!thisChannel.equals(requiredChannel)) {
             Channel channel = event.getGuild().getTextChannelById(requiredChannel);

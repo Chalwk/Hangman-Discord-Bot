@@ -86,12 +86,12 @@ public class channel implements CommandInterface {
         if (initialErrorChecking(event, channel)) return;
         if (isAddOperation) {
             if (isChannelIdConfigured(channelID)) {
-                event.reply("Channel ID is already configured!").setEphemeral(true).queue();
+                event.reply("## Channel ID is already configured!").setEphemeral(true).queue();
                 return;
             }
         } else {
             if (!isChannelIdConfigured(channelID)) {
-                event.reply("Channel ID is not configured! Unable to remove.").setEphemeral(true).queue();
+                event.reply("## Channel ID is not configured! Unable to remove.").setEphemeral(true).queue();
                 return;
             }
         }
@@ -104,10 +104,10 @@ public class channel implements CommandInterface {
     private boolean initialErrorChecking(SlashCommandInteractionEvent event, TextChannel channel) {
         Member member = event.getMember();
         if (!member.hasPermission(Permission.ADMINISTRATOR)) {
-            event.reply("You must be an administrator to use this command!").setEphemeral(true).queue();
+            event.reply("## You must be an administrator to use this command!").setEphemeral(true).queue();
             return false;
         } else if (channel == null) {
-            event.reply("Invalid channel ID!").setEphemeral(true).queue();
+            event.reply("## Invalid channel ID!").setEphemeral(true).queue();
             return true;
         }
         return false;
@@ -130,21 +130,21 @@ public class channel implements CommandInterface {
 
             if (isAddOperation) {
                 lines.add(channelID);
-                event.reply("Channel ID saved!").setEphemeral(true).queue();
+                event.reply("## Channel ID saved!").setEphemeral(true).queue();
                 gameManager.setChannelID(channelID);
             } else {
                 lines.removeIf(line -> line.trim().equals(channelID));
-                event.reply("Channel ID removed!").setEphemeral(true).queue();
+                event.reply("## Channel ID removed!").setEphemeral(true).queue();
                 gameManager.setChannelID("");
             }
 
             Files.writeString(filePath, String.join("\n", lines));
         } catch (URISyntaxException e) {
             Logger.info("Failed to parse file URI: " + e.getMessage());
-            event.reply("Failed to read data from the config file!").setEphemeral(true).queue();
+            event.reply("## Failed to read data from the config file!").setEphemeral(true).queue();
         } catch (IOException e) {
             Logger.info("Failed to read data: " + e.getMessage());
-            event.reply("[IOException] Failed to save channel ID!").setEphemeral(true).queue();
+            event.reply("## Failed to save channel ID!").setEphemeral(true).queue();
         }
     }
 }
