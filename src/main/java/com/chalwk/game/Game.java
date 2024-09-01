@@ -23,7 +23,6 @@ public class Game {
 
     private final User invitingPlayer;
     private final User invitedPlayer;
-    private final SlashCommandInteractionEvent event;
     private final int hangmanLayout;
     private final String wordToGuess;
     private final int maxMistakes;
@@ -45,7 +44,6 @@ public class Game {
      * @param layout         the layout of the hangman game
      */
     public Game(User invitingPlayer, User invitedPlayer, SlashCommandInteractionEvent event, int layout, GameManager gameManager) {
-        this.event = event;
         this.invitingPlayer = invitingPlayer;
         this.invitedPlayer = invitedPlayer;
         this.hangmanLayout = layout;

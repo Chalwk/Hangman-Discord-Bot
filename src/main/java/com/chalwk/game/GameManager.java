@@ -18,9 +18,9 @@ import static com.chalwk.util.fileIO.loadChannelID;
  */
 public class GameManager {
 
+    private static String channelID = "";
     private final Map<User, Game> games;
     private final Map<User, GameInvite> pendingInvites;
-    private static String channelID = "";
 
     /**
      * Initializes an empty map for storing active games and pending invites.
@@ -34,6 +34,14 @@ public class GameManager {
         this.pendingInvites = new HashMap<>();
     }
 
+    public static String getChannelID() {
+        return GameManager.channelID;
+    }
+
+    public void setChannelID(String channelID) {
+        GameManager.channelID = channelID;
+    }
+
     /**
      * Checks if a user is currently playing a game.
      *
@@ -42,14 +50,6 @@ public class GameManager {
      */
     public boolean isInGame(User player) {
         return games.containsKey(player);
-    }
-
-    public static String getChannelID() {
-        return GameManager.channelID;
-    }
-
-    public void setChannelID(String channelID) {
-        GameManager.channelID = channelID;
     }
 
     /**

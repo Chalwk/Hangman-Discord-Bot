@@ -22,6 +22,10 @@ public class WordList {
         loadWordsFromFile();
     }
 
+    public static String getRandomWord() {
+        return wordList.get((int) (Math.random() * wordList.size()));
+    }
+
     private void loadWordsFromFile() {
         String fileName = "words.txt";
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
@@ -40,9 +44,5 @@ public class WordList {
         } catch (IOException e) {
             Logger.warning("Failed to load words from file: " + e.getMessage());
         }
-    }
-
-    public static String getRandomWord() {
-        return wordList.get((int) (Math.random() * wordList.size()));
     }
 }

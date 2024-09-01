@@ -27,7 +27,6 @@ public class EventListeners extends ListenerAdapter {
                 .queue(message -> message.editMessageEmbeds(embed.build()).queue());
     }
 
-
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         System.out.println("""
