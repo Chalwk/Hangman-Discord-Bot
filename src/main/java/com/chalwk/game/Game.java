@@ -173,6 +173,7 @@ public class Game {
                     String channelID = GameManager.getChannelID();
                     TextChannel channel = getShardManager().getTextChannelById(channelID);
                     channel.sendMessage("Times up! Game between " + invitingPlayer.getAsMention() + " and " + invitedPlayer.getAsMention() + " has ended!").queue();
+                    gameManager.removeGame(invitingPlayer, invitedPlayer);
                 }
             }
         };
