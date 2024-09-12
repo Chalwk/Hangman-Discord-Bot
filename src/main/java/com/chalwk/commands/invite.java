@@ -5,7 +5,7 @@ package com.chalwk.commands;
 import com.chalwk.CommandManager.CommandCooldownManager;
 import com.chalwk.CommandManager.CommandInterface;
 import com.chalwk.game.GameManager;
-import com.chalwk.util.settings;
+import com.chalwk.util.Settings;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -72,7 +72,7 @@ public class invite implements CommandInterface {
     public void execute(SlashCommandInteractionEvent event) {
         if (COOLDOWN_MANAGER.isOnCooldown(event)) return;
 
-        if (settings.notCorrectChannel(event)) return;
+        if (Settings.notCorrectChannel(event)) return;
 
         OptionMapping layoutOption = event.getOption("layout");
         User userToInvite = event.getOption("opponent").getAsUser();

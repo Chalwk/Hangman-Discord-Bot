@@ -1,6 +1,3 @@
-/* Copyright (c) 2024 Jericho Crosby <jericho.crosby227@gmail.com>. Licensed under GNU General Public License v3.0.
-   See the LICENSE file or visit https://www.gnu.org/licenses/gpl-3.0.en.html for details. */
-
 package com.chalwk.game;
 
 import java.util.EnumMap;
@@ -23,10 +20,11 @@ public enum HangmanLayout {
     EXERCISE_5,
     EXERCISE_6;
 
-    private static final EnumMap<HangmanLayout, String> LAYOUTS = new EnumMap<>(HangmanLayout.class);
+    private static final EnumMap<HangmanLayout, String> LAYOUTS = initializeLayouts();
 
-    static {
-        LAYOUTS.put(GALLOWS_1, """
+    private static EnumMap<HangmanLayout, String> initializeLayouts() {
+        EnumMap<HangmanLayout, String> layouts = new EnumMap<>(HangmanLayout.class);
+        layouts.put(GALLOWS_1, """
                 ┌─────┐
                 │     │
                 │     O
@@ -35,7 +33,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(GALLOWS_2, """
+        layouts.put(GALLOWS_2, """
                 ┌─────┐
                 │     │
                 │     O
@@ -44,7 +42,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(GALLOWS_3, """
+        layouts.put(GALLOWS_3, """
                 ┌─────┐
                 │     │
                 │     O
@@ -53,7 +51,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(GALLOWS_4, """
+        layouts.put(GALLOWS_4, """
                 ┌─────┐
                 │     │
                 │     O
@@ -62,7 +60,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(GALLOWS_5, """
+        layouts.put(GALLOWS_5, """
                 ┌─────┐
                 │     │
                 │     O
@@ -71,7 +69,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(GALLOWS_6, """
+        layouts.put(GALLOWS_6, """
                 ┌─────┐
                 │     │
                 │     O
@@ -80,7 +78,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(GALLOWS_7, """
+        layouts.put(GALLOWS_7, """
                 ┌─────┐
                 │     │
                 │
@@ -89,7 +87,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(GALLOWS_8, """
+        layouts.put(GALLOWS_8, """
                 ┌─────┐
                 │
                 │
@@ -98,7 +96,7 @@ public enum HangmanLayout {
                 │
                 └─────┘
                 """);
-        LAYOUTS.put(EXERCISE_1, """
+        layouts.put(EXERCISE_1, """
                 []--,---,--[]
                     \\ O /
                      - -
@@ -106,40 +104,41 @@ public enum HangmanLayout {
                      / \\
                     =   =
                 """);
-        LAYOUTS.put(EXERCISE_2, """
+        layouts.put(EXERCISE_2, """
                 []--=-O-=--[]
                      '-'
                       v
                      / )
                     ~  z
                 """);
-        LAYOUTS.put(EXERCISE_3, """
+        layouts.put(EXERCISE_3, """
                     ._O_.
                 []--<-+->--[]
                       X
                      / \\
                     -   -
                 """);
-        LAYOUTS.put(EXERCISE_4, """
+        layouts.put(EXERCISE_4, """
                     ,_O_,
                 []--(---)--[]
                      >'>
                      - -
                 """);
-        LAYOUTS.put(EXERCISE_5, """
+        layouts.put(EXERCISE_5, """
                     ,-O-,
                 []--=---=--[]
                      2"2
                 """);
-        LAYOUTS.put(EXERCISE_6, """
+        layouts.put(EXERCISE_6, """
                      _._
                     / O \\
                     \\| |/
                 []--+=-=+--[]
                 """);
+        return layouts;
     }
 
     public String getLayout() {
-        return LAYOUTS.get(this);
+        return LAYOUTS.getOrDefault(this, "Layout not found");
     }
 }

@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.chalwk.util.fileIO.loadChannelID;
+import static com.chalwk.util.FileIO.loadChannelID;
 
 /**
  * Manages game-related operations, including creating games, inviting players, and managing pending invites.

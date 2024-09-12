@@ -14,31 +14,22 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-/**
- * A class responsible for initializing and setting up the bot for the Virtual Pets game project.
- */
 public class BotInitializer {
 
-    /**
-     * An instance of the PetDataHandler class to manage pet data.
-     */
-    public static ShardManager shardManager;
+    private static final Logger logger = LoggerFactory.getLogger(BotInitializer.class);
+    private static final String GAME_ACTIVITY = "GAME";
+    private static final OnlineStatus BOT_STATUS = OnlineStatus.ONLINE;
 
+    public static ShardManager shardManager;
     public static GameManager gameManager;
 
-    /**
-     * The bot's authentication token.
-     */
     private final String token;
 
-    /**
-     * Constructs a BotInitializer instance and retrieves the bot's authentication token.
-     *
-     * @throws IOException if there's an error reading the token file.
-     */
     public BotInitializer() throws IOException {
         this.token = authentication.getToken();
     }
@@ -51,32 +42,30 @@ public class BotInitializer {
         return shardManager;
     }
 
-    /**
-     * Initializes the bot and sets up event listeners and commands.
-     */
     public void initializeBot() {
+        try {
+            gameManager = new GameManager();
+            shardManager = createShardManager();
+            shardManager.addEventListener(new EventListeners());
+            registerCommands(shardManager);
+        } catch (Exception e) {
+            logger.error("Failed to initialize bot", e);
+        }
+    }
 
-        gameManager = new GameManager();
-
+    private ShardManager createShardManager() {
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(this.token)
-                .setStatus(OnlineStatus.ONLINE)
-                .setActivity(Activity.playing("GAME"))
+                .setStatus(BOT_STATUS)
+                .setActivity(Activity.playing(GAME_ACTIVITY))
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS,
                         GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.GUILD_PRESENCES,
                         GatewayIntent.MESSAGE_CONTENT);
 
-        shardManager = builder.build();
-        shardManager.addEventListener(new EventListeners());
-        registerCommands(shardManager);
+        return builder.build();
     }
 
-    /**
-     * Registers the available commands for the bot.
-     *
-     * @param shardManager The ShardManager instance used to manage the bot.
-     */
     private void registerCommands(ShardManager shardManager) {
         CommandListener commands = new CommandListener();
         commands.add(new invite(gameManager));

@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chalwk.util.fileIO.isChannelIdConfigured;
-import static com.chalwk.util.fileIO.saveChannelID;
+import static com.chalwk.util.FileIO.isChannelIdConfigured;
+import static com.chalwk.util.FileIO.saveChannelID;
 
 /**
  * Represents a command for setting or removing the channel for the Hangman bot to use.

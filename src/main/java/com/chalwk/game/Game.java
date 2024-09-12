@@ -2,8 +2,8 @@
    See the LICENSE file or visit https://www.gnu.org/licenses/gpl-3.0.en.html for details. */
 package com.chalwk.game;
 
+import com.chalwk.util.Settings;
 import com.chalwk.util.WordList;
-import com.chalwk.util.settings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -203,7 +203,7 @@ public class Game {
      */
     private boolean isTimeUp() {
         long elapsedTime = System.currentTimeMillis() - startTime.getTime();
-        return elapsedTime > settings.getDefaultTimeLimit() * 1000L;
+        return elapsedTime > Settings.getDefaultTimeLimit() * 1000L;
     }
 
     /**

@@ -16,26 +16,25 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class fileIO {
+public class FileIO {
 
-    private static final String configFile = "/config.txt";
+    private static final String CONFIG_FILE = "/config.txt";
 
     public static String loadChannelID() {
-        try (Stream<String> lines = Files.lines(Paths.get(fileIO.class.getResource(configFile).toURI()))) {
+        try (Stream<String> lines = Files.lines(getConfigFilePath())) {
             return lines.filter(line -> !line.trim().isEmpty())
                     .findFirst()
                     .map(String::trim)
                     .orElse("");
         } catch (IOException | URISyntaxException e) {
-            Logger.info("Failed to load Channel ID " + e.getMessage());
+            Logger.info("Failed to load Channel ID: " + e.getMessage());
             return null;
         }
     }
 
     public static void saveChannelID(String channelID, boolean isAddOperation, SlashCommandInteractionEvent event, GameManager gameManager) {
         try {
-            URI fileUri = fileIO.class.getResource(configFile).toURI();
-            Path filePath = Paths.get(fileUri);
+            Path filePath = getConfigFilePath();
             List<String> lines = Files.readAllLines(filePath);
 
             if (isAddOperation) {
@@ -49,28 +48,29 @@ public class fileIO {
             }
 
             Files.writeString(filePath, String.join("\n", lines));
-        } catch (URISyntaxException e) {
-            Logger.info("Failed to parse file URI: " + e.getMessage());
-            event.reply("## Failed to read data from the config file!").setEphemeral(true).queue();
-        } catch (IOException e) {
-            Logger.info("Failed to read data: " + e.getMessage());
+        } catch (URISyntaxException | IOException e) {
+            Logger.info("Failed to save Channel ID: " + e.getMessage());
             event.reply("## Failed to save channel ID!").setEphemeral(true).queue();
         }
     }
 
     public static boolean isChannelIdConfigured(String channelID) {
-
         if (channelID == null) {
             return false;
         } else if (!GameManager.getChannelID().isEmpty()) {
             return true;
         }
 
-        try (Stream<String> lines = Files.lines(Paths.get(fileIO.class.getResource(configFile).toURI()))) {
+        try (Stream<String> lines = Files.lines(getConfigFilePath())) {
             return lines.anyMatch(line -> line.trim().equals(channelID));
         } catch (IOException | URISyntaxException e) {
             Logger.info("Failed to read data: " + e.getMessage());
             return false;
         }
+    }
+
+    private static Path getConfigFilePath() throws URISyntaxException {
+        URI fileUri = FileIO.class.getResource(CONFIG_FILE).toURI();
+        return Paths.get(fileUri);
     }
 }
